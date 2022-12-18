@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#1B2838"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:padding="15dp"
+    tools:context=".SearchFragment">
+
+    <TextView
+        android:id="@+id/text_key_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Tìm Kiến Game: "
+        android:textColor="#1999ff"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/game_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    <TextView
+        android:layout_gravity="center"
+        android:id="@+id/text_no_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Game Not Found !"
+        android:textColor="#EC0B0B"
+        android:textSize="24sp"
+        android:visibility="gone"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--TODO đây là item RecyclerView các thể loại game-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+    <!--TODO đây là Lable tên của thể loại game-->
+    <TextView
+        android:id="@+id/text_name_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="FEATURED GAME"
+        android:textColor="@color/white"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+    <!--TODO đây là RecyclerView hiển thị một số game của thể loại game đó-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_marginTop="8dp"
+        android:id="@+id/list_game"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:itemCount="6"
+        tools:listitem="@layout/item_game"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="horizontal" />
+
+</LinearLayout>
