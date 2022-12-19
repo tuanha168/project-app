@@ -1,7 +1,10 @@
 package com.example.storegame.ui.detailGame;
 
+import android.app.DownloadManager;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +27,11 @@ import com.example.storegame.modle.Messages;
 import com.example.storegame.modle.ResultGames;
 import com.example.storegame.modle.ResultGamesBought;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +57,15 @@ public class DetailGameFragment extends Fragment {
         args.putSerializable(ID_GAME, game);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void downloadAPK() {
+        DownloadManager downloadManager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri uri = Uri.parse(game.getDownloadLink());
+        DownloadManager.Request request = new DownloadManager.Request(uri);
+        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+
+        Long reference = downloadManager.enqueue(request);
     }
 
     @Override
@@ -87,6 +103,7 @@ public class DetailGameFragment extends Fragment {
         ImageAdapter imageAdapter = new ImageAdapter(requireContext());
         imageAdapter.setData(game.getImages());
         binding.listImg.setAdapter(imageAdapter);
+        binding.btnDownload.setOnClickListener(view1 -> downloadAPK());
         initView();
         binding.btnAddStore.setOnClickListener(view1 -> {
 
@@ -135,6 +152,7 @@ public class DetailGameFragment extends Fragment {
             binding.textGameBought.setVisibility(View.GONE);
         } else {
             binding.btnAddStore.setVisibility(View.VISIBLE);
+            binding.btnDownload.setVisibility(View.VISIBLE);
             Call<ResultGamesBought> call1 = retrofit.getGameBought();
             call1.enqueue(new Callback<ResultGamesBought>() {
                 @Override

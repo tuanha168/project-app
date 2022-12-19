@@ -81,7 +81,7 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         Call<ResultGames> call = retrofit.getAllGames();
-        binding.textKeySearch.setText("Tìm kiến game: " + keySearch);
+        binding.textKeySearch.setText("Tìm kiếm game: " + keySearch);
         call.enqueue(new Callback<ResultGames>() {
             @Override
             public void onResponse(Call<ResultGames> call, Response<ResultGames> response) {
