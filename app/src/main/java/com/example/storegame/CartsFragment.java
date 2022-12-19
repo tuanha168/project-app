@@ -39,6 +39,7 @@ import retrofit2.Response;
 public class CartsFragment extends Fragment {
 
     private FragmentStoreBinding binding;
+
     SharedPreferencesData sharedPreferencesData;
     RetrofitInstance retrofitInstance;
     GamesVerticalAdapter gamesAdapter;

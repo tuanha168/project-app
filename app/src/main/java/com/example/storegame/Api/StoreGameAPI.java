@@ -8,6 +8,7 @@ import com.example.storegame.modle.PostUser;
 import com.example.storegame.modle.ResultCategories;
 import com.example.storegame.modle.ResultGame;
 import com.example.storegame.modle.ResultGames;
+import com.example.storegame.modle.ResultGamesBought;
 import com.example.storegame.modle.ResultUser;
 import com.example.storegame.modle.Token;
 import com.example.storegame.modle.User;
@@ -61,4 +62,7 @@ public interface StoreGameAPI {
 
     @POST("api/v1/games/purchase")
     Call<Messages> payGames(@Body Carts carts);
+
+    @GET("/api/v1/games/bought")
+    Call<ResultGamesBought> getGameBought();
 }

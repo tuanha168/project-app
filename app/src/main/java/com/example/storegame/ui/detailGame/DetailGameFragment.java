@@ -19,8 +19,10 @@ import com.example.storegame.Data.SharedPreferencesData;
 import com.example.storegame.R;
 import com.example.storegame.databinding.FragmentDetailGameBinding;
 import com.example.storegame.modle.Game;
+import com.example.storegame.modle.GameBought;
 import com.example.storegame.modle.Messages;
 import com.example.storegame.modle.ResultGames;
+import com.example.storegame.modle.ResultGamesBought;
 
 import java.util.List;
 
@@ -130,8 +132,32 @@ public class DetailGameFragment extends Fragment {
     void initView() {
         if (!sharedPreferencesData.isLogin()) {
             binding.btnAddStore.setVisibility(View.GONE);
+            binding.textGameBought.setVisibility(View.GONE);
         } else {
             binding.btnAddStore.setVisibility(View.VISIBLE);
+            Call<ResultGamesBought> call1 = retrofit.getGameBought();
+            call1.enqueue(new Callback<ResultGamesBought>() {
+                @Override
+                public void onResponse(Call<ResultGamesBought> call, Response<ResultGamesBought> response) {
+                    if (response.isSuccessful()) {
+                        List<GameBought> gameBoughts = response.body().getGames();
+                        for (GameBought gameBought:gameBoughts) {
+                            if (gameBought.getGame().getId().equals(game.getId())) {
+                                binding.textGameBought.setVisibility(View.VISIBLE);
+                                binding.btnAddStore.setVisibility(View.GONE);
+                            }
+                        }
+                    } else {
+                        Toast toast = Toast.makeText(requireContext(), "Call games faille", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResultGamesBought> call, Throwable t) {
+
+                }
+            });
             Call<ResultGames> call = retrofit.getGamesInCart();
             call.enqueue(new Callback<ResultGames>() {
                 @Override

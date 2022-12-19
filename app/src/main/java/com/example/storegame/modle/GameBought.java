@@ -3,11 +3,11 @@ package com.example.storegame.modle;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class GamesBought {
+public class GameBought {
 
     @SerializedName("game")
     @Expose
-    private String game;
+    private Game game;
     @SerializedName("date_bought")
     @Expose
     private String dateBought;
@@ -15,11 +15,11 @@ public class GamesBought {
     @Expose
     private String id;
 
-    public String getGame() {
+    public Game getGame() {
         return game;
     }
 
-    public void setGame(String game) {
+    public void setGame(Game game) {
         this.game = game;
     }
 
@@ -38,5 +38,4 @@ public class GamesBought {
     public void setId(String id) {
         this.id = id;
     }
-
 }

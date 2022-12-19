@@ -3,8 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_carts"
+        android:icon="@drawable/ic_baseline_store_24"
         android:orderInCategory="100"
         android:title="Carts"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_game_purchased"
         android:icon="@drawable/ic_baseline_store_24"
+        android:orderInCategory="100"
+        android:title="Game purchased"
         app:showAsAction="never" />
 </menu>

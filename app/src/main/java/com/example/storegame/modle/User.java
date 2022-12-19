@@ -47,7 +47,7 @@ public class User {
     private List<Object> wishlist = null;
     @SerializedName("games_bought")
     @Expose
-    private List<GamesBought> gamesBought = null;
+    private List<ResultGamesBought> gamesBought = null;
 
     public User( String name, Integer sex, String birthday, String address, String email) {
         this.name = name;
@@ -161,11 +161,11 @@ public class User {
         this.wishlist = wishlist;
     }
 
-    public List<GamesBought> getGamesBought() {
+    public List<ResultGamesBought> getGamesBought() {
         return gamesBought;
     }
 
-    public void setGamesBought(List<GamesBought> gamesBought) {
+    public void setGamesBought(List<ResultGamesBought> gamesBought) {
         this.gamesBought = gamesBought;
     }
 }

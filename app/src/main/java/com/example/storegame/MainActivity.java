@@ -52,11 +52,11 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
     View headerView;
     SharedPreferencesData sharedPreferencesData;
     RetrofitInstance retrofitInstance;
-    TextView userName, email;
+    TextView userName, email, money;
     NavigationView navigationView;
     Intent refresh;
     ImageButton buttonEditProfile;
-    MenuItem menuCarts;
+    MenuItem menuCarts, menuBought;
     Menu menu;
 
     @Override
@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         navigationView = binding.navView;
         headerView = binding.navView.getHeaderView(0);
         userName = headerView.findViewById(R.id.user_name);
+        money = headerView.findViewById(R.id.txt_money);
         email = headerView.findViewById(R.id.email);
+
         navigationView.getMenu().getItem(2).setVisible(false);
         initView();
         refresh = new Intent(this, MainActivity.class);
@@ -102,10 +104,13 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         this.menu = menu;
         getMenuInflater().inflate(R.menu.main, menu);
         menuCarts = menu.findItem(R.id.action_carts);
+        menuBought = menu.findItem(R.id.action_game_purchased);
         if(sharedPreferencesData.isLogin()) {
             menuCarts.setVisible(true);
+            menuBought.setVisible(true);
         } else {
             menuCarts.setVisible(false);
+            menuBought.setVisible(false);
         }
         return true;
     }
@@ -113,8 +118,16 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
+        switch (id) {
+            case R.id.action_carts:
+                replaceView(R.id.nav_host_fragment_content_main, CartsFragment.newInstance("", ""));
+                break;
+            case R.id.action_game_purchased:
+                replaceView(R.id.nav_host_fragment_content_main, new GamePurchasedFragment());
+                break;
+        }
         if (id == R.id.action_carts) {
-            replaceView(R.id.nav_host_fragment_content_main, CartsFragment.newInstance("", ""));
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -133,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         initView();
         binding.appBarMain.toolbar.setTitle("Home");
         menuCarts.setVisible(true);
+        menuBought.setVisible(true);
         FragmentManager fm = this.getSupportFragmentManager();
         fm.popBackStack();
     }
@@ -151,6 +165,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
                         User user = response.body().getUser();
                         userName.setText(user.getName());
                         email.setText(user.getEmail());
+                        money.setText("Money: " + user.getBudget() + "$");
                     } else {
                         sharedPreferencesData.setLogin(false);
                         startActivity(refresh);

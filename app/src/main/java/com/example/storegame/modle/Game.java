@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 public class Game implements Serializable {
@@ -57,6 +56,28 @@ public class Game implements Serializable {
     @SerializedName("__v")
     @Expose
     private Integer v;
+    @SerializedName("is_installed")
+    @Expose
+    private Boolean isInstalled;
+    @SerializedName("download_link")
+    @Expose
+    private String downloadLink;
+
+    public Boolean getInstalled() {
+        return isInstalled;
+    }
+
+    public void setInstalled(Boolean installed) {
+        isInstalled = installed;
+    }
+
+    public String getDownloadLink() {
+        return downloadLink;
+    }
+
+    public void setDownloadLink(String downloadLink) {
+        this.downloadLink = downloadLink;
+    }
 
     public Game(String id) {
         this.id = id;
