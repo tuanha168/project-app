@@ -184,8 +184,8 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
 
     @Override
     public void sendIDGame(String id) {
-
-        StoreGameAPI retrofit = retrofitInstance.getRetrofit("").create(StoreGameAPI.class);
+        String token =  sharedPreferencesData.isLogin() ? sharedPreferencesData.getToken() : "";
+        StoreGameAPI retrofit = retrofitInstance.getRetrofit(token).create(StoreGameAPI.class);
         Call<ResultGame> call = retrofit.getGame(id);
         call.enqueue(new Callback<ResultGame>() {
             @Override
