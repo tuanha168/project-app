@@ -65,4 +65,7 @@ public interface StoreGameAPI {
 
     @GET("/api/v1/games/bought")
     Call<ResultGamesBought> getGameBought();
+
+    @PUT("/api/v1/games/{id}/change-install-status-game")
+    Call<Messages> downloadedGame(@Path("id") String id);
 }

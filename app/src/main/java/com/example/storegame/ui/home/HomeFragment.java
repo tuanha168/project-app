@@ -1,5 +1,6 @@
 package com.example.storegame.ui.home;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
@@ -22,12 +23,16 @@ import com.example.storegame.Api.RetrofitInstance;
 import com.example.storegame.Api.StoreGameAPI;
 import com.example.storegame.Data.SharedPreferencesData;
 import com.example.storegame.R;
+import com.example.storegame.databinding.DialogPayBinding;
 import com.example.storegame.databinding.FragmentHomeBinding;
 import com.example.storegame.modle.Category;
+import com.example.storegame.modle.Code;
 import com.example.storegame.modle.Game;
+import com.example.storegame.modle.Messages;
 import com.example.storegame.modle.ResultCategories;
 import com.example.storegame.modle.ResultGames;
 import com.example.storegame.ui.signup.SignupFragment;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;

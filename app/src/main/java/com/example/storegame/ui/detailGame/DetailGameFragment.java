@@ -1,9 +1,13 @@
 package com.example.storegame.ui.detailGame;
 
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.DateFormat;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +32,9 @@ import com.example.storegame.modle.ResultGames;
 import com.example.storegame.modle.ResultGamesBought;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +72,28 @@ public class DetailGameFragment extends Fragment {
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
 
         Long reference = downloadManager.enqueue(request);
+
+        Call<Messages> call = retrofit.downloadedGame(game.getId());
+        call.enqueue(new Callback<Messages>() {
+            @Override
+            public void onResponse(Call<Messages> call, Response<Messages> response) {
+                Toast toast;
+                if (response.isSuccessful()) {
+                    toast = Toast.makeText(requireContext(), "Download Game Thành Công", Toast.LENGTH_SHORT);
+                } else {
+                    toast = Toast.makeText(requireContext(), "Failure", Toast.LENGTH_SHORT);
+                }
+                toast.show();
+                binding.btnDownload.setVisibility(View.GONE);
+                binding.textGameBought.setText("Game Installed");
+            }
+
+            @Override
+            public void onFailure(Call<Messages> call, Throwable t) {
+                Toast toast = Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
     }
 
     @Override
@@ -92,7 +120,15 @@ public class DetailGameFragment extends Fragment {
         retrofitInstance = new RetrofitInstance();
         sharedPreferencesData = new SharedPreferencesData(requireContext());
         retrofit = retrofitInstance.getRetrofit(sharedPreferencesData.getToken()).create(StoreGameAPI.class);
-        binding.txtReleased.setText(game.getReleaseDate());
+
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
+        try {
+            String output = formatter.format(parser.parse(game.getReleaseDate()));
+            binding.txtReleased.setText(output);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         binding.txtNameGame.setText(game.getName());
         Glide.with(requireContext()).load(game.getFeatureImage()).into(binding.featureImage);
         binding.txtDeveloper.setText(game.getDeveloper());
@@ -107,19 +143,16 @@ public class DetailGameFragment extends Fragment {
         initView();
         binding.btnAddStore.setOnClickListener(view1 -> {
 
+            binding.btnAddStore.setEnabled(false);
             Call<Messages> call = retrofit.addOrRemoveGameInStore(game.getId());
             call.enqueue(new Callback<Messages>() {
                 @Override
                 public void onResponse(Call<Messages> call, Response<Messages> response) {
                     Toast toast;
                     if (response.isSuccessful()) {
-                        toast = Toast.makeText(requireContext(), "Add " + game.getName() + " to cart successfully", Toast.LENGTH_SHORT);
-                        if (isCheckCart) {
-                            isCheckCart = false;
-                        } else {
-                            isCheckCart = true;
-                        }
-                    initView();
+                        isCheckCart = !isCheckCart;
+                        toast = Toast.makeText(requireContext(), (isCheckCart ? "Add " : "Remove ") + game.getName() + " successfully", Toast.LENGTH_SHORT);
+                        checkGameInCart();
                     } else {
                         toast = Toast.makeText(requireContext(), "Failure", Toast.LENGTH_SHORT);
                     }
@@ -151,8 +184,6 @@ public class DetailGameFragment extends Fragment {
             binding.btnAddStore.setVisibility(View.GONE);
             binding.textGameBought.setVisibility(View.GONE);
         } else {
-            binding.btnAddStore.setVisibility(View.VISIBLE);
-            binding.btnDownload.setVisibility(View.VISIBLE);
             Call<ResultGamesBought> call1 = retrofit.getGameBought();
             call1.enqueue(new Callback<ResultGamesBought>() {
                 @Override
@@ -161,51 +192,64 @@ public class DetailGameFragment extends Fragment {
                         List<GameBought> gameBoughts = response.body().getGames();
                         for (GameBought gameBought:gameBoughts) {
                             if (gameBought.getGame().getId().equals(game.getId())) {
+                                binding.btnDownload.setVisibility(View.VISIBLE);
                                 binding.textGameBought.setVisibility(View.VISIBLE);
+                                if (game.getInstalled()) {
+                                    binding.textGameBought.setText("Game Installed");
+                                    binding.btnDownload.setVisibility(View.GONE);
+                                }
                                 binding.btnAddStore.setVisibility(View.GONE);
+                                return;
                             }
                         }
+
                     } else {
                         Toast toast = Toast.makeText(requireContext(), "Call games faille", Toast.LENGTH_SHORT);
                         toast.show();
                     }
+                    checkGameInCart();
                 }
 
                 @Override
                 public void onFailure(Call<ResultGamesBought> call, Throwable t) {
-
-                }
-            });
-            Call<ResultGames> call = retrofit.getGamesInCart();
-            call.enqueue(new Callback<ResultGames>() {
-                @Override
-                public void onResponse(Call<ResultGames> call, Response<ResultGames> response) {
-                    if (response.isSuccessful()) {
-                        List<Game> gameList = response.body().getGames();
-                        for (Game game1 : gameList) {
-                            if (game1.getId().equals(game.getId())) {
-                                isCheckCart = true;
-                                break;
-                            } else {
-                                isCheckCart = false;
-                            }
-                        }
-                    }
-                    if (isCheckCart) {
-                        binding.btnAddStore.setImageResource(R.drawable.ic_baseline_delete_forever_24);
-                    } else {
-                        binding.btnAddStore.setImageResource(R.drawable.ic_baseline_shopping_cart_24);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResultGames> call, Throwable t) {
-                    Toast toast = Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT);
-                    toast.show();
+                    checkGameInCart();
                 }
             });
 
         }
 
+    }
+
+    void checkGameInCart() {
+        Call<ResultGames> call = retrofit.getGamesInCart();
+        call.enqueue(new Callback<ResultGames>() {
+            @Override
+            public void onResponse(Call<ResultGames> call, Response<ResultGames> response) {
+                if (response.isSuccessful()) {
+                    List<Game> gameList = response.body().getGames();
+                    for (Game game1 : gameList) {
+                        if (game1.getId().equals(game.getId())) {
+                            isCheckCart = true;
+                            break;
+                        } else {
+                            isCheckCart = false;
+                        }
+                    }
+                }
+                if (isCheckCart) {
+                    binding.btnAddStore.setImageResource(R.drawable.ic_baseline_delete_forever_24);
+                } else {
+                    binding.btnAddStore.setImageResource(R.drawable.ic_baseline_shopping_cart_24);
+                }
+                binding.btnAddStore.setVisibility(View.VISIBLE);
+                binding.btnAddStore.setEnabled(true);
+            }
+
+            @Override
+            public void onFailure(Call<ResultGames> call, Throwable t) {
+                Toast toast = Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        });
     }
 }

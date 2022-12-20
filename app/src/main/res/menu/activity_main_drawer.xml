@@ -11,6 +11,9 @@
             android:id="@+id/nav_login"
             android:title="Login" />
         <item
+            android:id="@+id/nav_code"
+            android:title="Input Code" />
+        <item
             android:id="@+id/nav_logout"
             android:title="Logout" />
     </group>

@@ -1,5 +1,6 @@
 package com.example.storegame;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Bundle;
@@ -29,7 +30,10 @@ import com.example.storegame.Api.RetrofitInstance;
 import com.example.storegame.Api.StoreGameAPI;
 import com.example.storegame.Data.SharedPreferencesData;
 import com.example.storegame.databinding.ActivityMainBinding;
+import com.example.storegame.databinding.DialogPayBinding;
+import com.example.storegame.modle.Code;
 import com.example.storegame.modle.Game;
+import com.example.storegame.modle.Messages;
 import com.example.storegame.modle.ResultGame;
 import com.example.storegame.modle.ResultUser;
 import com.example.storegame.modle.User;
@@ -39,6 +43,8 @@ import com.example.storegame.ui.gallery.LoginFragment;
 import com.example.storegame.ui.home.HomeFragment;
 import com.example.storegame.ui.signup.SignupFragment;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         email = headerView.findViewById(R.id.email);
 
         navigationView.getMenu().getItem(2).setVisible(false);
+        navigationView.getMenu().getItem(3).setVisible(false);
         initView();
         refresh = new Intent(this, MainActivity.class);
         mAppBarConfiguration = new AppBarConfiguration.Builder(
@@ -84,7 +91,45 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+        FragmentManager fm = this.getSupportFragmentManager();
         navigationView.getMenu().getItem(2).setOnMenuItemClickListener(item -> {
+            DialogPayBinding binding = DialogPayBinding.inflate(getLayoutInflater());
+            Dialog dialog = new Dialog(Objects.requireNonNull(fm.getPrimaryNavigationFragment()).requireContext());
+            dialog.setContentView(binding.getRoot());
+            dialog.show();
+            binding.btnOk.setOnClickListener(view2 -> {
+                StoreGameAPI retrofit = retrofitInstance.getRetrofit(sharedPreferencesData.getToken()).create(StoreGameAPI.class);
+                Code code = new Code(binding.edtCode.getText().toString());
+                Call<Messages> messagesCall = retrofit.activeCode(code);
+                messagesCall.enqueue(new Callback<Messages>() {
+                    @Override
+                    public void onResponse(Call<Messages> call, Response<Messages> response) {
+                        if (response.isSuccessful()) {
+                            if (response.code() == 200) {
+                                Toast toast = Toast.makeText(fm.getPrimaryNavigationFragment().requireContext(), "Nhập mã thành công", Toast.LENGTH_SHORT);
+                                toast.show();
+                                dialog.dismiss();
+                                initView();
+                            }
+                        } else {
+                            Toast toast = Toast.makeText(fm.getPrimaryNavigationFragment().requireContext(), "Mã không hợp lệ", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<Messages> call, Throwable t) {
+                        Toast toast = Toast.makeText(fm.getPrimaryNavigationFragment().requireContext(), t.getMessage().toString(), Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
+                });
+            });
+            binding.btnCancel.setOnClickListener(view22 -> {
+                dialog.dismiss();
+            });
+            return false;
+        });
+        navigationView.getMenu().getItem(3).setOnMenuItemClickListener(item -> {
             sharedPreferencesData.setLogin(false);
             sharedPreferencesData.setToken("");
             startActivity(refresh);
@@ -149,12 +194,14 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnL
         menuBought.setVisible(true);
         FragmentManager fm = this.getSupportFragmentManager();
         fm.popBackStack();
+
     }
 
     public void initView() {
         if (sharedPreferencesData.isLogin()) {
             navigationView.getMenu().getItem(1).setVisible(false);
             navigationView.getMenu().getItem(2).setVisible(true);
+            navigationView.getMenu().getItem(3).setVisible(true);
             headerView.setVisibility(View.VISIBLE);
             StoreGameAPI retrofit = retrofitInstance.getRetrofit(sharedPreferencesData.getToken()).create(StoreGameAPI.class);
             Call<ResultUser> call = retrofit.getUserProfile();

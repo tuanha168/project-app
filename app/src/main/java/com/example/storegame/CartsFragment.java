@@ -2,6 +2,7 @@ package com.example.storegame;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.os.Debug;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,6 @@ public class CartsFragment extends Fragment {
         CartsFragment fragment = new CartsFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -97,56 +97,25 @@ public class CartsFragment extends Fragment {
         });
 
         binding.btnPay.setOnClickListener(view1 -> {
-            DialogPayBinding binding = DialogPayBinding.inflate(getLayoutInflater());
-            Dialog dialog = new Dialog(requireContext());
-            dialog.setContentView(binding.getRoot());
-            dialog.show();
-            binding.btnOk.setOnClickListener(view2 -> {
-                Code code = new Code(binding.edtCode.getText().toString());
-                Call<Messages> messagesCall = retrofit.activeCode(code);
-                messagesCall.enqueue(new Callback<Messages>() {
-                    @Override
-                    public void onResponse(Call<Messages> call, Response<Messages> response) {
-                        if (response.isSuccessful()) {
-                            if (response.code() == 200) {
-                                Call<Messages> call1 = retrofit.payGames(cart);
-                                call1.enqueue(new Callback<Messages>() {
-                                    @Override
-                                    public void onResponse(Call<Messages> call, Response<Messages> response) {
-                                        Toast toast;
-                                        if (response.isSuccessful()) {
-                                            toast = Toast.makeText(requireContext(), "Mua thành công", Toast.LENGTH_SHORT);
-                                            init();
-                                            dialog.dismiss();
-                                        } else {
-                                            toast = Toast.makeText(requireContext(), "Không thành công", Toast.LENGTH_SHORT);
-                                            dialog.dismiss();
-                                        }
-                                        toast.show();
-                                    }
-
-                                    @Override
-                                    public void onFailure(Call<Messages> call, Throwable t) {
-                                        Toast toast = Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT);
-                                        toast.show();
-                                    }
-                                });
-                            }
-                        } else {
-                            Toast toast = Toast.makeText(requireContext(), "Mã không hợp lệ", Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
+            Call<Messages> call1 = retrofit.payGames(cart);
+            call1.enqueue(new Callback<Messages>() {
+                @Override
+                public void onResponse(Call<Messages> call, Response<Messages> response) {
+                    Toast toast;
+                    if (response.isSuccessful()) {
+                        toast = Toast.makeText(requireContext(), "Mua thành công", Toast.LENGTH_SHORT);
+                        init();
+                    } else {
+                        toast = Toast.makeText(requireContext(), "Không thành công", Toast.LENGTH_SHORT);
                     }
+                    toast.show();
+                }
 
-                    @Override
-                    public void onFailure(Call<Messages> call, Throwable t) {
-                        Toast toast = Toast.makeText(requireContext(), t.getMessage().toString(), Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                });
-            });
-            binding.btnCancel.setOnClickListener(view22 -> {
-                dialog.dismiss();
+                @Override
+                public void onFailure(Call<Messages> call, Throwable t) {
+                    Toast toast = Toast.makeText(requireContext(), t.getMessage(), Toast.LENGTH_SHORT);
+                    toast.show();
+                }
             });
         });
 

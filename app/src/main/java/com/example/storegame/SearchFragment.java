@@ -1,5 +1,6 @@
 package com.example.storegame;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,10 +15,15 @@ import androidx.fragment.app.Fragment;
 import com.example.storegame.Adapter.GamesVerticalAdapter;
 import com.example.storegame.Api.RetrofitInstance;
 import com.example.storegame.Api.StoreGameAPI;
+import com.example.storegame.databinding.ActivityMainBinding;
+import com.example.storegame.databinding.DialogPayBinding;
 import com.example.storegame.databinding.FragmentSearchBinding;
+import com.example.storegame.modle.Code;
 import com.example.storegame.modle.Game;
+import com.example.storegame.modle.Messages;
 import com.example.storegame.modle.ResultGames;
 import com.example.storegame.ui.home.HomeFragment;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
